@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>記録一覧</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>これまでの記録</h1>
+
+    {% if records|length == 0 %}
+      <p>まだ記録がありません。</p>
+    {% endif %}
+
+    {% for r in records %}
+  <a href="/edit/{{ r.id }}" style="text-decoration:none; color:inherit;">
+    <div class="card">
+
+      <div class="card-date">
+        {{ r.date }}（{{ r.weekday }}）
+      </div>
+
+      <div class="card-meta">
+        天気：{{ r.weather or "―" }}　
+        点数：{{ r.score }}
+      </div>
+
+      <div class="card-good">
+        <ul>
+          {% if r.good1 %}<li>{{ r.good1 }}</li>{% endif %}
+          {% if r.good2 %}<li>{{ r.good2 }}</li>{% endif %}
+          {% if r.good3 %}<li>{{ r.good3 }}</li>{% endif %}
+        </ul>
+      </div>
+
+    </div>
+  </a>
+{% endfor %}
+
+    <p>
+      <a href="/record">記録画面に戻る</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
+

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ログイン</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+  <h1>ログイン</h1>
+
+  <form method="post">
+    <div class="field">
+      <label>ニックネーム</label>
+      <input type="text" name="nickname" required>
+    </div>
+
+    <div class="field">
+      <label>パスワード</label>
+      <input type="password" name="password" required>
+    </div>
+
+    <button type="submit">ログイン</button>
+  </form>
+</div>
+
+</body>
+</html>

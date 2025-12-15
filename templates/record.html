@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>今日の記録</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+  <h1>今日の気分記録</h1>
+
+  <!-- 日付・曜日（表示のみ） -->
+  {% if edit %}
+  <p class="date">
+    {{ record.date }}（{{ record.weekday }}）
+  </p>
+{% else %}
+  <p class="date">
+    {{ date }}（{{ weekday }}）
+  </p>
+{% endif %}
+
+
+  <form method="post">
+
+    <!-- 天気 -->
+    <div class="field">
+      <label>今日の天気</label><br>
+      <select name="weather">
+        <option value="">選択しない</option>
+        <option value="晴れ">晴れ</option>
+        <option value="くもり">くもり</option>
+        <option value="雨">雨</option>
+        <option value="雪">雪</option>
+      </select>
+    </div>
+
+    <!-- 点数 -->
+    <div class="field">
+      <label>1日の点数（1〜10）</label><br>
+      <input type="range" name="score" min="1" max="10" value="5"
+             oninput="scoreValue.textContent = this.value">
+      <span id="scoreValue">5</span>
+    </div>
+
+    <!-- よかったこと -->
+    <div class="field">
+      <label>よかったこと①</label><br>
+      <textarea name="good1" rows="2"></textarea>
+    </div>
+
+    <div class="field">
+      <label>よかったこと②</label><br>
+      <textarea name="good2" rows="2"></textarea>
+    </div>
+
+    <div class="field">
+      <label>よかったこと③</label><br>
+      <textarea name="good3" rows="2"></textarea>
+    </div>
+
+<!-- 保存フォーム -->
+<form method="post">
+  <!-- 各種入力 -->
+  <button type="submit">
+    {% if edit %}更新する{% else %}保存する{% endif %}
+  </button>
+</form>
+
+<!-- 削除フォーム（完全に別） -->
+{% if edit %}
+<form method="post" action="/delete/{{ record.id }}"
+      onsubmit="return confirm('この記録を削除しますか？\nこの操作は元に戻せません。');"
+      style="margin-top: 16px;">
+  <button type="submit" class="delete-btn">
+    削除する
+  </button>
+</form>
+{% endif %}
+
+  
+  </form>
+  <p>
+    <a href="/history">これまでの記録を見る</a>
+  </p>
+  
+  <p>
+    <a href="/logout">ログアウト</a>
+  </p>
+  </div>
+</body>
+</html>
