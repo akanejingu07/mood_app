@@ -1,25 +1,27 @@
 from flask import Flask, render_template, request, redirect, session
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import os
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # --------------------
-# DB接続（Render対応）
+# DB接続
 # --------------------
 def get_db_connection():
     database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise RuntimeError("DATABASE_URL is not set")
     return psycopg2.connect(
         database_url,
-        sslmode="require",   # ← ★これが最重要
-        cursor_factory=RealDictCursor
+        cursor_factory=RealDictCursor,
+        sslmode="require"
     )
 
 # --------------------
-# 初期テーブル作成
+# 初期テーブル作成（最初の1回だけ呼ばれる）
 # --------------------
 def init_db():
     conn = get_db_connection()
@@ -53,17 +55,21 @@ def init_db():
     conn.close()
 
 # --------------------
-# トップ
+# 初回アクセス時にDB初期化
+# --------------------
+@app.before_request
+def before_request():
+    if not getattr(app, "_db_initialized", False):
+        init_db()
+        app._db_initialized = True
+
+# --------------------
+# ルーティング
 # --------------------
 @app.route("/")
 def index():
-    if "user_id" in session:
-        return redirect("/record")
     return redirect("/login")
 
-# --------------------
-# ログイン
-# --------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -73,114 +79,79 @@ def login():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute(
-            "SELECT * FROM users WHERE nickname = %s",
-            (nickname,)
-        )
+        cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
         user = cur.fetchone()
 
-        if user is None:
+        if not user:
             cur.execute(
                 "INSERT INTO users (nickname, password) VALUES (%s, %s)",
                 (nickname, password)
             )
             conn.commit()
-            cur.execute(
-                "SELECT * FROM users WHERE nickname = %s",
-                (nickname,)
-            )
+            cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
             user = cur.fetchone()
+
+        session["user_id"] = user["id"]
 
         cur.close()
         conn.close()
-
-        session["user_id"] = user["id"]
         return redirect("/record")
 
     return render_template("login.html")
 
-# --------------------
-# 記録入力
-# --------------------
 @app.route("/record", methods=["GET", "POST"])
 def record():
     if "user_id" not in session:
-        return redirect("/")
+        return redirect("/login")
 
     today = datetime.now()
     date = today.strftime("%Y-%m-%d")
     weekday = today.strftime("%A")
 
     if request.method == "POST":
-        weather = request.form.get("weather")
-        score = request.form.get("score")
-        good1 = request.form.get("good1")
-        good2 = request.form.get("good2")
-        good3 = request.form.get("good3")
-
         conn = get_db_connection()
         cur = conn.cursor()
 
         cur.execute("""
             INSERT INTO records
             (user_id, date, weekday, weather, score, good1, good2, good3)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
             session["user_id"],
             date,
             weekday,
-            weather,
-            score,
-            good1,
-            good2,
-            good3
+            request.form.get("weather"),
+            request.form.get("score"),
+            request.form.get("good1"),
+            request.form.get("good2"),
+            request.form.get("good3"),
         ))
 
         conn.commit()
         cur.close()
         conn.close()
-
         return redirect("/record")
 
     return render_template("record.html", date=date, weekday=weekday)
 
-# --------------------
-# 履歴
-# --------------------
 @app.route("/history")
 def history():
     if "user_id" not in session:
-        return redirect("/")
+        return redirect("/login")
 
     conn = get_db_connection()
     cur = conn.cursor()
-
-    cur.execute("""
-        SELECT *
-        FROM records
-        WHERE user_id = %s
-        ORDER BY date DESC
-    """, (session["user_id"],))
-
+    cur.execute(
+        "SELECT * FROM records WHERE user_id=%s ORDER BY date DESC",
+        (session["user_id"],)
+    )
     records = cur.fetchall()
-
     cur.close()
     conn.close()
 
     return render_template("history.html", records=records)
 
-# --------------------
-# ログアウト
-# --------------------
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect("/")
-
-# --------------------
-# 起動時DB初期化（Renderでは1回だけ実行される）
-# --------------------
-init_db()
-
-if __name__ == "__main__":
-    app.run()
+    return redirect("/login")
