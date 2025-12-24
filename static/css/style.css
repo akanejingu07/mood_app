@@ -174,9 +174,21 @@ hr {
 .delete-btn:hover {
   background-color: #d65c5c;
 }
-@media (min-width: 768px) {
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
   .container {
-    max-width: 720px;
-    margin: 0 auto;
+    padding: 12px;
+  }
+
+  form {
+    padding: 16px;
   }
 }
