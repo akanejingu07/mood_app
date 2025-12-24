@@ -29,35 +29,39 @@
       <label>今日の天気</label><br>
       <select name="weather">
         <option value="">選択しない</option>
-        <option value="晴れ">晴れ</option>
-        <option value="くもり">くもり</option>
-        <option value="雨">雨</option>
-        <option value="雪">雪</option>
+        <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
+        <option value="くもり" {% if edit and record.weather == "くもり" %}selected{% endif %}>くもり</option>
+        <option value="雨" {% if edit and record.weather == "雨" %}selected{% endif %}>雨</option>
+        <option value="雪" {% if edit and record.weather == "雪" %}selected{% endif %}>雪</option>
       </select>
-    </div>
+      
 
     <!-- 点数 -->
     <div class="field">
       <label>1日の点数（1〜10）</label><br>
-      <input type="range" name="score" min="1" max="10" value="5"
-             oninput="scoreValue.textContent = this.value">
-      <span id="scoreValue">5</span>
+      <input type="range" name="score" min="1" max="10"
+       value="{{ record.score if edit else 5 }}"
+       oninput="scoreValue.textContent = this.value">
+
+      <span id="scoreValue">
+        {{ record.score if edit else 5 }}
+      </span>
     </div>
 
     <!-- よかったこと -->
     <div class="field">
       <label>よかったこと①</label><br>
-      <textarea name="good1" rows="2"></textarea>
+      <textarea name="good1" rows="2">{{ record.good1 if edit }}</textarea>
     </div>
 
     <div class="field">
       <label>よかったこと②</label><br>
-      <textarea name="good2" rows="2"></textarea>
+      <textarea name="good2" rows="2">{{ record.good2 if edit }}</textarea>
     </div>
 
     <div class="field">
       <label>よかったこと③</label><br>
-      <textarea name="good3" rows="2"></textarea>
+      <textarea name="good3" rows="2">{{ record.good3 if edit }}</textarea>
     </div>
 
 <!-- 保存フォーム -->
