@@ -177,21 +177,21 @@ hr {
 
 @media (max-width: 480px) {
   body {
-      font-size: 17px;
+      font-size: 18px;
     }
   
   h1 {
-      font-size: 24px;
+      font-size: 26px;
       margin-bottom: 20px;
     }
     
   h2 {
-      font-size: 19px;
+      font-size: 20px;
     }
 
   .container {
-    margin: 16px;
-    padding: 20px;
+    margin: 12px;
+    padding: 24px;
     border-radius: 12px;
   }
 
@@ -199,14 +199,46 @@ hr {
     padding: 16px;
   }
   
-  select,
-  textarea {
-    font-size: 1.05rem;
+  @media (max-width: 480px) {
+    label {
+      font-size: 1rem;
+    }
+  
+    select,
+    textarea,
+    input[type="range"] {
+      font-size: 1.05rem;
+    }
+  
+    button,
+    .delete-btn {
+      font-size: 1.1rem;
+      padding: 18px;
+    }
   }
   
-  button,
-  .delete-btn {
+/* iPhone入力時の自動ズーム防止 */
+input,
+textarea,
+select {
+  font-size: 17px;
+}}
+@media (max-width: 480px) {
+  .card {
+    padding: 24px;
+    border-radius: 18px;
+  }
+
+  .card-date {
     font-size: 1.05rem;
-    padding: 16px;
+  }
+
+  .card-meta {
+    font-size: 0.95rem;
+  }
+
+  .card-good li {
+    margin-bottom: 10px;
   }
 }
+
