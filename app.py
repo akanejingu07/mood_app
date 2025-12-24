@@ -151,6 +151,58 @@ def history():
 
     return render_template("history.html", records=records)
 
+@app.route("/edit/<int:record_id>", methods=["GET", "POST"])
+def edit(record_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # 対象レコード取得（自分の記録だけ）
+    cur.execute(
+        "SELECT * FROM records WHERE id=%s AND user_id=%s",
+        (record_id, session["user_id"])
+    )
+    record = cur.fetchone()
+
+    if not record:
+        cur.close()
+        conn.close()
+        return "Not Found", 404
+
+    if request.method == "POST":
+        cur.execute("""
+            UPDATE records
+            SET weather=%s,
+                score=%s,
+                good1=%s,
+                good2=%s,
+                good3=%s
+            WHERE id=%s AND user_id=%s
+        """, (
+            request.form.get("weather"),
+            request.form.get("score"),
+            request.form.get("good1"),
+            request.form.get("good2"),
+            request.form.get("good3"),
+            record_id,
+            session["user_id"]
+        ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return redirect("/history")
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "record.html",
+        edit=True,
+        record=record
+    )
+
 @app.route("/logout")
 def logout():
     session.clear()
