@@ -176,19 +176,37 @@ hr {
 }
 
 @media (max-width: 480px) {
+  body {
+      font-size: 17px;
+    }
+  
   h1 {
-    font-size: 22px;
-  }
-
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
   h2 {
-    font-size: 18px;
-  }
+      font-size: 19px;
+    }
 
   .container {
-    padding: 12px;
+    margin: 16px;
+    padding: 20px;
+    border-radius: 12px;
   }
 
   form {
+    padding: 16px;
+  }
+  
+  select,
+  textarea {
+    font-size: 1.05rem;
+  }
+  
+  button,
+  .delete-btn {
+    font-size: 1.05rem;
     padding: 16px;
   }
 }
