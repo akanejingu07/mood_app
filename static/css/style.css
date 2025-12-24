@@ -241,6 +241,23 @@ hr {
     textarea {
       min-height: 64px;
     }
+
+    @media (max-width: 480px) {
+
+      /* 入力要素のはみ出し防止 */
+      select,
+      textarea,
+      input {
+        box-sizing: border-box;
+        max-width: 100%;
+      }
+    }    
+    @media (max-width: 480px) {
+      .card,
+      .container {
+        overflow: hidden;
+      }
+    }    
   
     /* -------------------------
        スコア表示
