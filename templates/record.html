@@ -38,7 +38,7 @@
       <label>今日の天気</label><br>
       <select name="weather">
         <option value="">選択しない</option>
-       <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
+        <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
         <option value="くもり" {% if edit and record.weather == "くもり" %}selected{% endif %}>くもり</option>
         <option value="雨" {% if edit and record.weather == "雨" %}selected{% endif %}>雨</option>
         <option value="雪" {% if edit and record.weather == "雪" %}selected{% endif %}>雪</option>
