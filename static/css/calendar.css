@@ -1,0 +1,85 @@
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.week-header,
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.week-header div {
+  text-align: center;
+  font-weight: 600;
+}
+
+.day {
+  min-height: 72px;
+  padding: 6px;
+  border-radius: 8px;
+  background: #f9fdfb;
+  position: relative;
+}
+
+.day.other {
+  opacity: 0.3;
+}
+
+.date-num {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.score {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+}
+
+/* 共通 */
+.day-cell {
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  color: #333;
+}
+
+/* 0（0〜4点） */
+.score-0 {
+  background: #f2f2f2;
+}
+
+/* 1（5〜10点） */
+.score-1 {
+  background: #cfe8d5;
+}
+
+/* -------- スマホ用 -------- */
+@media (max-width: 600px) {
+
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .day-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+  }
+
+  .date {
+    font-size: 14px;
+  }
+
+  .score {
+    font-size: 18px;
+  }
+}

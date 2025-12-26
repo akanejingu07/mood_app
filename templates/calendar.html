@@ -1,0 +1,15 @@
+<div class="calendar-grid">
+  {% for d in days %}
+    <div class="
+      day-cell
+      {% if not d.in_month %}out{% endif %}
+      {% if d.score is not none %}score-{{ d.score }}{% endif %}
+    ">
+      <div class="date">{{ d.day }}</div>
+
+      {% if d.score is not none %}
+        <div class="score">{{ d.score }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

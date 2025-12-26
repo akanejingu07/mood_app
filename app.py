@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
 import os
 import psycopg2
+import calendar
+from datetime import date
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
 
@@ -202,6 +204,50 @@ def edit(record_id):
         edit=True,
         record=record
     )
+@app.route("/calendar")
+def calendar_view():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    today = date.today()
+    year = today.year
+    month = today.month
+
+    # 日曜始まりのカレンダー
+    cal = calendar.Calendar(firstweekday=6)
+    month_days = list(cal.itermonthdates(year, month))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT date, score FROM records WHERE user_id=%s",
+        (session["user_id"],)
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # date -> binary score の辞書
+    score_map = {}
+    for r in rows:
+        binary = 1 if r["score"] is not None and r["score"] >= 5 else 0
+        score_map[r["date"]] = binary
+
+    days = []
+    for d in month_days:
+        days.append({
+            "day": d.day,
+            "in_month": d.month == month,
+            "score": score_map.get(d)
+        })
+
+    return render_template(
+        "calendar.html",
+        year=year,
+        month=month,
+        days=days
+    )
+
 
 @app.route("/logout")
 def logout():
