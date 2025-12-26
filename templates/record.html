@@ -10,13 +10,16 @@
   <div class="container">
   <h1>今日の気分記録</h1>
   <div class="field">
-    <label>記録する日付</label><br>
-    <input
-      type="date"
-      name="record_date"
-      value="{{ record.date if edit else date }}"
-    >
-  </div>
+    <form method="post">
+      <label>
+        記録する日付
+        <input
+          type="date"
+          name="record_date"
+          id="recordDate"
+          value="{{ date }}"
+        >
+      </label>    
   
   <!-- 日付・曜日（表示のみ） -->
   {% if edit %}
@@ -101,5 +104,21 @@
     <a href="/logout">ログアウト</a>
   </p>
   </div>
+  <script>
+    const dateInput = document.getElementById("recordDate");
+    const dateDisplay = document.getElementById("dateDisplay");
+  
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  
+    dateInput.addEventListener("change", () => {
+      if (!dateInput.value) return;
+  
+      const d = new Date(dateInput.value);
+      const weekday = weekdays[d.getDay()];
+  
+      dateDisplay.textContent = `${dateInput.value}（${weekday}）`;
+    });
+  </script>
+  
 </body>
 </html>
