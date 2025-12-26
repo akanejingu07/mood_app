@@ -10,6 +10,8 @@
   <div class="container">
   <h1>今日の気分記録</h1>
   <form method="post">
+
+    <!-- 日付 -->
     <div class="field">
       <label>
         記録する日付
@@ -17,60 +19,51 @@
           type="date"
           name="record_date"
           id="recordDate"
-          value="{{ date }}"
+          value="{{ record.date if edit else date }}"
         >
       </label>
-    </div>   
+    </div>
   
-    <!-- 日付・曜日（表示のみ） -->
+    <!-- 表示用日付 -->
     <p class="date" id="dateDisplay">
-     {{ date }}（{{ weekday }}）
+      {% if edit %}
+        {{ record.date }}（{{ record.weekday }}）
+      {% else %}
+        {{ date }}（{{ weekday }}）
+      {% endif %}
     </p>
 
-      <!-- 天気 -->
-      <div class="field">
-        <label>今日の天気</label><br>
-        <select name="weather">
-          <option value="">選択しない</option>
-         <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
-          <option value="くもり" {% if edit and record.weather == "くもり" %}selected{% endif %}>くもり</option>
-          <option value="雨" {% if edit and record.weather == "雨" %}selected{% endif %}>雨</option>
-          <option value="雪" {% if edit and record.weather == "雪" %}selected{% endif %}>雪</option>
-       </select>
-      </div>  
+    <!-- 天気 -->
+    <div class="field">
+      <label>今日の天気</label><br>
+      <select name="weather">
+        <option value="">選択しない</option>
+       <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
+        <option value="くもり" {% if edit and record.weather == "くもり" %}selected{% endif %}>くもり</option>
+        <option value="雨" {% if edit and record.weather == "雨" %}selected{% endif %}>雨</option>
+        <option value="雪" {% if edit and record.weather == "雪" %}selected{% endif %}>雪</option>
+     </select>
+    </div>  
 
-     <!-- 点数 -->
-     <div class="field">
-        <label>1日の点数（1〜10）</label><br>
-        <input type="range" name="score" min="1" max="10" value="5"
-               oninput="scoreValue.textContent = this.value">
-       <span id="scoreValue">5</span>
-      </div>
+    <!-- 点数 -->
+    <input type="range" name="score" min="1" max="10"
+          value="{{ record.score if edit else 5 }}"
+          oninput="scoreValue.textContent = this.value">
+    <span id="scoreValue">
+      {{ record.score if edit else 5 }}
+    </span>
 
-     <!-- よかったこと -->
-     <div class="field">
-        <label>よかったこと①</label>
-        <textarea name="good1" rows="2"></textarea>
-      </div>
-  
-      <div class="field">
-        <label>よかったこと②</label>
-        <textarea name="good2" rows="2"></textarea>
-     </div>
-  
-      <div class="field">
-       <label>よかったこと③</label>
-        <textarea name="good3" rows="2"></textarea>
-     </div>
-  
-    <button type="submit">保存する</button>
+    <!-- よかったこと -->
+    <textarea name="good1">{{ record.good1 if edit }}</textarea>
+    <textarea name="good2">{{ record.good2 if edit }}</textarea>
+    <textarea name="good3">{{ record.good3 if edit }}</textarea>
+
+    <!-- ★ここが重要 -->
+    <button type="submit">
+     {% if edit %}更新する{% else %}保存する{% endif %}
+    </button>
+
   </form>
-  
-  <!-- 各種入力 -->
-  <button type="submit">
-    {% if edit %}更新する{% else %}保存する{% endif %}
-  </button>
-</form>
 
 <!-- 削除フォーム（完全に別） -->
 {% if edit %}
