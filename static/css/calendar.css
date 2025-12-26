@@ -1,85 +1,52 @@
-.calendar {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+/* ===== カレンダー（最小構成） ===== */
 
-.week-header,
-.week {
+.calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-.week-header div {
-  text-align: center;
-  font-weight: 600;
-}
-
-.day {
+/* 日セル */
+.day-cell {
   min-height: 72px;
+  border-radius: 12px;
+  background: #f2f2f2;
+  text-align: center;
   padding: 6px;
-  border-radius: 8px;
-  background: #f9fdfb;
-  position: relative;
+  box-sizing: border-box;
 }
 
-.day.other {
+/* 月外の日 */
+.day-cell.out {
   opacity: 0.3;
 }
 
-.date-num {
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
-.score {
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 999px;
-  font-weight: 600;
-  text-decoration: none;
-  color: #fff;
-}
-
-/* 共通 */
-.day-cell {
-  border-radius: 12px;
-  padding: 10px;
-  text-align: center;
-  color: #333;
-}
-
-/* 0（0〜4点） */
+/* 0 / 1 */
 .score-0 {
-  background: #f2f2f2;
+  background: #e0e0e0;
 }
 
-/* 1（5〜10点） */
 .score-1 {
   background: #cfe8d5;
 }
 
-/* -------- スマホ用 -------- */
+/* 日付 */
+.day-cell .date {
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+/* スコア */
+.day-cell .score {
+  font-weight: 600;
+}
+
+/* スマホ */
 @media (max-width: 600px) {
-
-  .calendar-grid {
-    grid-template-columns: 1fr;
-  }
-
   .day-cell {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px;
-  }
-
-  .date {
+    min-height: 56px;
     font-size: 14px;
-  }
-
-  .score {
-    font-size: 18px;
   }
 }
