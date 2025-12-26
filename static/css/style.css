@@ -30,6 +30,10 @@ h1 {
   margin-bottom: 24px;
 }
 
+p a {
+  font-weight: 600;
+}
+
 /* コンテナ（中央寄せ） */
 .container {
   max-width: 640px;
