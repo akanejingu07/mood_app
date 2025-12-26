@@ -111,6 +111,16 @@ def record():
     weekday = today.strftime("%A")
 
     if request.method == "POST":
+        record_date = request.form.get("record_date")
+
+        # 日付が未指定なら今日
+        if not record_date:
+            record_date = date
+
+        weekday = datetime.strptime(
+            record_date, "%Y-%m-%d"
+        ).strftime("%A")
+
         conn = get_db_connection()
         cur = conn.cursor()
 
@@ -120,7 +130,7 @@ def record():
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """, (
             session["user_id"],
-            date,
+            record_date,
             weekday,
             request.form.get("weather"),
             request.form.get("score"),
