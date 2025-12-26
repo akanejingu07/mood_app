@@ -9,7 +9,15 @@
 <body>
   <div class="container">
   <h1>今日の気分記録</h1>
-
+  <div class="field">
+    <label>記録する日付</label><br>
+    <input
+      type="date"
+      name="record_date"
+      value="{{ record.date if edit else date }}"
+    >
+  </div>
+  
   <!-- 日付・曜日（表示のみ） -->
   {% if edit %}
   <p class="date">
