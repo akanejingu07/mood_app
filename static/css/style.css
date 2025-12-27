@@ -165,3 +165,80 @@ a.button:hover {
     font-size: 15px;
   }
 }
+.history-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem;
+}
+
+.history-card {
+  background-color: #f0fff0; /* 薄緑 */
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.history-card:hover {
+  transform: translateY(-2px);
+}
+
+.history-date {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  font-size: 16px;
+}
+
+.history-score,
+.history-weather {
+  font-size: 14px;
+  margin-bottom: 0.2rem;
+}
+
+.history-good {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0.3rem 0 0 0;
+  font-size: 14px;
+}
+
+.calendar-link {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.calendar-link a {
+  display: inline-block;
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.calendar-link a:hover {
+  background-color: #45a049;
+}
+
+/* レスポンシブ */
+@media (max-width: 600px) {
+  .history-card {
+    padding: 0.8rem;
+  }
+  .history-date {
+    font-size: 15px;
+  }
+  .history-score,
+  .history-weather,
+  .history-good {
+    font-size: 13px;
+  }
+  .calendar-link a {
+    font-size: 15px;
+    padding: 0.4rem 0.8rem;
+  }
+}

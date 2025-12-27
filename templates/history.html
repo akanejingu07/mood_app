@@ -1,20 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>履歴</h2>
+
 <div class="history-container">
   {% for r in records %}
-  <a href="{{ url_for('edit', record_id=r.id) }}" class="history-card">
-    <div class="card-header">
-      {{ r.date.strftime("%Y-%m-%d") }} ({{ r.weekday }})
-    </div>
-    <div class="card-body">
-      <div class="card-item"><strong>スコア:</strong> {{ r.score or '-' }}</div>
-      <div class="card-item"><strong>天気:</strong> {{ r.weather or '-' }}</div>
-      <div class="card-item"><strong>良かったこと:</strong>
-        {{ r.good1 }}{% if r.good2 %}, {{ r.good2 }}{% endif %}{% if r.good3 %}, {{ r.good3 }}{% endif %}
-      </div>
+  <a href="{{ url_for('edit', record_id=r.id) }}">
+    <div class="history-card">
+    <div class="history-date">{{ r.date.strftime("%Y-%m-%d") }}</div>
+    <div class="history-score">スコア: {{ r.score }}</div>
+    <div class="history-weather">天気: {{ r.weather }}</div>
+    <ul class="history-good">
+      {% if r.good1 %}<li>{{ r.good1 }}</li>{% endif %}
+      {% if r.good2 %}<li>{{ r.good2 }}</li>{% endif %}
+      {% if r.good3 %}<li>{{ r.good3 }}</li>{% endif %}
+    </ul>
     </div>
   </a>
+  </div>  
   {% endfor %}
 </div>
+
+<div class="calendar-link">
+  <a href="{{ url_for('calendar_view') }}">カレンダー</a>
+</div>
+
 {% endblock %}
