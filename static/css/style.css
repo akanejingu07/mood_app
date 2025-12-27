@@ -288,8 +288,8 @@ input[type=range]::-moz-range-thumb {
  カレンダー（calendar.html）
 --------------------------- */
 .calendar-card-wrapper {
-  padding: 16px;
   background-color: #fff;
+  border-radius: 4px;
 }
 
 .calendar-grid {

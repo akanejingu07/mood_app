@@ -2,13 +2,12 @@
 {% block title %}calendar{% endblock %}
 
 {% block content %}
-<div class="calendar-nav">
-  <a href="{{ url_for('calendar_view', year=prev_year, month=prev_month) }}">← 前月</a>
-  <span>{{ year }}年 {{ month }}月</span>
-  <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}">次月 →</a>
-</div>
-
 <div class="calendar-card-wrapper">
+  <div class="calendar-nav">
+    <a href="{{ url_for('calendar_view', year=prev_year, month=prev_month) }}">← 前月</a>
+    <span>{{ year }}年 {{ month }}月</span>
+    <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}">次月 →</a>
+  </div>
   <div class="calendar-grid">
     {% for d in days %}
       <div class="day-cell {% if not d.in_month %}out{% endif %} {% if d.score is not none %}score-{{ d.score }}{% endif %}">
