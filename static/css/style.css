@@ -47,7 +47,6 @@ header nav a {
 --------------------------- */
 button, input[type="submit"] {
   background-color: #529a52;
-  color: white;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -178,6 +177,18 @@ input[type=range]::-moz-range-thumb {
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 12px 12px;
+}
+/* ログイン画面の入力フォーム統一 */
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    width: 100%;      /* 横幅をフォームに合わせる */
+    max-width: 300px; /* 最大幅を指定 */
+    padding: 8px 12px;
+    font-size: 16px;  /* 文字サイズ */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box; /* パディング込みで幅を計算 */
+    margin-bottom: 12px; /* 下の間隔 */
 }
 
 /* ---------------------------
