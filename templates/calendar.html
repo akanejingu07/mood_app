@@ -14,8 +14,9 @@
       {% if not d.in_month %}out{% endif %}
       {% if d.score is not none %}score-{{ d.score }}{% endif %}
     ">
-      <div class="date">{{ d.day }}</div>
-
+    <a href="{{ url_for('record') }}?date={{ day.date }}">
+      {{ day.day }}
+    </a>    
       {% if d.score is not none %}
         <div class="score">{{ d.score }}</div>
       {% endif %}
