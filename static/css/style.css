@@ -55,6 +55,19 @@ button, input[type="submit"] {
   font-size: 16px;
 }
 
+.btn {
+  display: inline-block;
+  background-color: #4caf50; /* 緑基調 */
+  color: #fff;
+  text-decoration: none; /* 下線を消す */
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin: 8px 0;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
 button:hover, input[type="submit"]:hover {
   background-color: #529a52;
 }
@@ -79,6 +92,47 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.record-form {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 16px;
+  max-width: 500px;
+  margin: 16px auto;
+}
+
+/* フォーム項目 */
+.record-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.record-form input[type="text"],
+.record-form input[type="number"],
+.record-form select,
+.record-form textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #fff; /* プルダウンも白に統一 */
+  box-sizing: border-box;
+}
+
+/* プルダウンの矢印調整 */
+.record-form select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D'10'%20height%3D'10'%20viewBox%3D'0%200%2010%2010'%20xmlns%3D'http%3A//www.w3.org/2000/svg'%3E%3Cpath%20d%3D'M0%202l5%205%205-5z'%20fill%3D'%234caf50'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px 12px;
 }
 
 /* ---------------------------
@@ -163,27 +217,18 @@ select {
   line-height: 20px;
 }
 
-/* ---------------------------
- レスポンシブ
---------------------------- */
-@media screen and (max-width: 768px) {
-  body {
-    padding: 0 8px;
-  }
-
+@media (max-width: 600px) {
   main {
-    padding: 12px 0;
-  }
-
-  .history-card {
     padding: 12px;
   }
-
-  .history-card h3 {
-    font-size: 15px;
+  .record-form {
+    padding: 12px;
+    margin: 12px auto;
   }
-
-  .history-card p, .history-card li {
-    font-size: 13px;
+  .record-form input,
+  .record-form select,
+  .record-form textarea,
+  .record-form button {
+    font-size: 14px;
   }
 }
