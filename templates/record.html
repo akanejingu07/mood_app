@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-{% block title %}今日の記録{% endblock %}
-
 {% block content %}
+
 <h2>
   {% if edit %}
     {{ record.date.strftime("%Y-%m-%d") }}の記録
@@ -11,43 +10,39 @@
 </h2>
 
 <form method="POST">
-  <input type="hidden" name="record_date" value="{{ date }}">
+  <input type="hidden" name="record_date" value="{{ record.date if edit else date }}">
 
-  <label>天気</label>
+  <label>天気:</label>
   <select name="weather">
-    {% for w in weather_options %}
-      <option value="{{ w }}" {% if record and record.weather == w %}selected{% endif %}>{{ w }}</option>
+    {% set weathers = ['晴れ', '雨', 'くもり', '雪', 'その他'] %}
+    {% for w in weathers %}
+      <option value="{{ w }}" {% if edit and record.weather == w %}selected{% endif %}>
+        {{ w }}
+      </option>
     {% endfor %}
   </select>
 
-  <label>気分スコア (0-10)</label>
-  <input type="number" name="score" min="0" max="10" value="{{ record.score if record else '' }}">
+  <label>スコア:</label>
+  <input type="number" name="score" min="0" max="10" value="{{ record.score if edit else '' }}">
 
-  <label>良かったこと1</label>
-  <input type="text" name="good1" value="{{ record.good1 if record else '' }}">
+  <label>良かったこと1:</label>
+  <input type="text" name="good1" value="{{ record.good1 if edit else '' }}">
 
-  <label>良かったこと2</label>
-  <input type="text" name="good2" value="{{ record.good2 if record else '' }}">
+  <label>良かったこと2:</label>
+  <input type="text" name="good2" value="{{ record.good2 if edit else '' }}">
 
-  <label>良かったこと3</label>
-  <input type="text" name="good3" value="{{ record.good3 if record else '' }}">
+  <label>良かったこと3:</label>
+  <input type="text" name="good3" value="{{ record.good3 if edit else '' }}">
 
   <button type="submit">保存</button>
 </form>
+
+<p>
+  <a href="/calendar">カレンダーを見る</a> |
+  <a href="/history">履歴に戻る</a>
+</p>
+
 {% endblock %}
-
-
-
-<!-- 削除フォーム（完全に別） -->
-{% if edit %}
-<form method="post" action="/delete/{{ record.id }}"
-      onsubmit="return confirm('この記録を削除しますか？\nこの操作は元に戻せません。');"
-      style="margin-top: 16px;">
-  <button type="submit" class="delete-btn">
-    削除する
-  </button>
-</form>
-{% endif %}
 
   
   </form>
