@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- <h2>{{ edit and record.date.strftime("%Y-%m-%d") or date }} の記録</h2> -->
 
 <form method="POST" class="record-card">
   <!-- 日付 -->
   <div class="form-group">
     <label for="record_date">日付</label>
     <input
-      type="date"
-      value="{{ record.date }}"
-      onchange="location.href='/record?date=' + this.value"
-    >
+    type="date"
+    name="record_date"
+    value="{{ record['date'] }}"
+    onchange="location.href='/record?date=' + this.value"
+  >
+  
   
   </div>
 
@@ -30,7 +31,10 @@
     <select id="weather" name="weather">
       {% set weathers = ['晴れ','雨','くもり','雪'] %}
       {% for w in weathers %}
-        <option value="{{ w }}" {% if edit and record.weather == w %}selected{% endif %}>{{ w }}</option>
+      <option value="{{ w }}"
+        {% if record["weather"] == w %}selected{% endif %}>
+        {{ w }}
+      </option>    
       {% endfor %}
     </select>
   </div>
@@ -38,15 +42,15 @@
   <!-- 良かったこと -->
   <div class="form-group">
     <label for="good1">良かったこと1</label>
-    <input type="text" id="good1" name="good1" value="{{ edit and record.good1 or '' }}">
+    <input type="text" name="good1" value="{{ record["good1"] or '' }}">
   </div>
   <div class="form-group">
     <label for="good2">良かったこと2</label>
-    <input type="text" id="good2" name="good2" value="{{ edit and record.good2 or '' }}">
+    <input type="text" name="good2" value="{{ record["good2"] or '' }}">
   </div>
   <div class="form-group">
     <label for="good3">良かったこと3</label>
-    <input type="text" id="good3" name="good3" value="{{ edit and record.good3 or '' }}">
+    <input type="text" name="good3" value="{{ record["good3"] or '' }}">
   </div>
 
   <button type="submit" class="button">{{ edit and "更新" or "保存" }}</button>
