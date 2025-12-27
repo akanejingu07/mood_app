@@ -90,86 +90,48 @@ def login():
 # --------------------
 # 記録画面
 # --------------------
-@app.route("/record", methods=["GET", "POST"])
+@app.route("/record")
 def record():
     if "user_id" not in session:
         return redirect("/login")
 
-    # --------------------
-    # POST（保存）
-    # --------------------
-    if request.method == "POST":
-        record_date = request.form.get("record_date")
-        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
+    date_str = request.args.get("date")
 
-        conn = get_db_connection()
-        cur = conn.cursor()
+    if date_str:
+        target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    else:
+        target_date = date.today()
 
-        cur.execute("""
-            SELECT id FROM records
-            WHERE user_id=%s AND date=%s
-        """, (session["user_id"], record_date))
-        existing = cur.fetchone()
-
-        if existing:
-            cur.execute("""
-                UPDATE records
-                SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
-                WHERE user_id=%s AND date=%s
-            """, (
-                request.form.get("weather"),
-                request.form.get("score"),
-                request.form.get("good1"),
-                request.form.get("good2"),
-                request.form.get("good3"),
-                session["user_id"],
-                record_date
-            ))
-        else:
-            cur.execute("""
-                INSERT INTO records
-                (user_id, date, weekday, weather, score, good1, good2, good3)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-            """, (
-                session["user_id"],
-                record_date,
-                weekday,
-                request.form.get("weather"),
-                request.form.get("score"),
-                request.form.get("good1"),
-                request.form.get("good2"),
-                request.form.get("good3")
-            ))
-
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return redirect(f"/record?date={record_date}")
-
-    # --------------------
-    # GET（表示）← ここが重要
-    # --------------------
-    record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
-    weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
+    weekday = target_date.strftime("%a")
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM records
-        WHERE user_id=%s AND date=%s
-    """, (session["user_id"], record_date))
+
+    # 日付でレコード取得
+    cur.execute(
+        "SELECT * FROM records WHERE user_id=%s AND date=%s",
+        (session["user_id"], target_date)
+    )
     record = cur.fetchone()
+
+    # なければ作成
+    if not record:
+        cur.execute(
+            """
+            INSERT INTO records (user_id, date, weekday)
+            VALUES (%s, %s, %s)
+            RETURNING *
+            """,
+            (session["user_id"], target_date, weekday)
+        )
+        record = cur.fetchone()
+        conn.commit()
+
     cur.close()
     conn.close()
 
-    return render_template(
-        "record.html",
-        record=record,
-        date=record_date,
-        weekday=weekday,
-        edit=record is not None
-    )
+    return render_template("record.html", record=record)
+
 
 # --------------------
 # 編集画面（historyカードから）
