@@ -1,28 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>これまで</h2>
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for r in records %}
-    <tr>
-      <td>{{ r.date.strftime("%Y-%m-%d") }}</td>
-      <td>{{ r.score }}</td>
-      <td>{{ r.weather }}</td>
-      <td><a href="{{ url_for('edit', record_id=r.id) }}">編集</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<p>
-  <a href="/calendar">カレンダーへ</a>
-  <a href="/record">記録画面に戻る</a>
-</p>
+<h2>履歴</h2>
+<div class="history-container">
+  {% for r in records %}
+  <a href="{{ url_for('edit', record_id=r.id) }}" class="history-card">
+    <div class="card-header">
+      {{ r.date.strftime("%Y-%m-%d") }} ({{ r.weekday }})
+    </div>
+    <div class="card-body">
+      <div class="card-item"><strong>スコア:</strong> {{ r.score or '-' }}</div>
+      <div class="card-item"><strong>天気:</strong> {{ r.weather or '-' }}</div>
+      <div class="card-item"><strong>良かったこと:</strong>
+        {{ r.good1 }}{% if r.good2 %}, {{ r.good2 }}{% endif %}{% if r.good3 %}, {{ r.good3 }}{% endif %}
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
 {% endblock %}

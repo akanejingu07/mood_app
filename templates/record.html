@@ -1,48 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
-
-<h2>
-  {% if edit %}
-    {{ record.date.strftime("%Y-%m-%d") }}の記録
-  {% else %}
-    今日の記録
-  {% endif %}
-</h2>
+<h2>{{ edit and record.date.strftime("%Y-%m-%d") or date }} の記録</h2>
 
 <form method="POST">
-  <input type="hidden" name="record_date" value="{{ record.date if edit else date }}">
+  <div class="record-card">
+    <div class="form-group">
+      <label for="record_date">日付</label>
+      <input type="date" id="record_date" name="record_date"
+             value="{{ edit and record.date.strftime('%Y-%m-%d') or date }}">
+    </div>
 
-  <label>天気:</label>
-  <select name="weather">
-    {% set weathers = ['晴れ', '雨', 'くもり', '雪', 'その他'] %}
-    {% for w in weathers %}
-      <option value="{{ w }}" {% if edit and record.weather == w %}selected{% endif %}>
-        {{ w }}
-      </option>
-    {% endfor %}
-  </select>
+    <div class="form-group">
+      <label for="score">スコア</label>
+      <input type="number" id="score" name="score" min="0" max="10"
+             value="{{ edit and record.score or '' }}">
+    </div>
 
-  <label>スコア:</label>
-  <input type="number" name="score" min="0" max="10" value="{{ record.score if edit else '' }}">
+    <div class="form-group">
+      <label for="weather">天気</label>
+      <select id="weather" name="weather">
+        {% set weathers = ['晴れ','雨','くもり','雪'] %}
+        {% for w in weathers %}
+          <option value="{{ w }}" {% if edit and record.weather == w %}selected{% endif %}>{{ w }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-  <label>良かったこと1:</label>
-  <input type="text" name="good1" value="{{ record.good1 if edit else '' }}">
+    <div class="form-group">
+      <label for="good1">良かったこと1</label>
+      <input type="text" id="good1" name="good1" value="{{ edit and record.good1 or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="good2">良かったこと2</label>
+      <input type="text" id="good2" name="good2" value="{{ edit and record.good2 or '' }}">
+    </div>
+    <div class="form-group">
+      <label for="good3">良かったこと3</label>
+      <input type="text" id="good3" name="good3" value="{{ edit and record.good3 or '' }}">
+    </div>
 
-  <label>良かったこと2:</label>
-  <input type="text" name="good2" value="{{ record.good2 if edit else '' }}">
-
-  <label>良かったこと3:</label>
-  <input type="text" name="good3" value="{{ record.good3 if edit else '' }}">
-
-  <button type="submit">保存</button>
+    <button type="submit" class="button">{{ edit and "更新" or "保存" }}</button>
+  </div>
 </form>
 
-<p>
-  <a href="/calendar">カレンダーを見る</a> |
-  <a href="/history">履歴に戻る</a>
-</p>
-
 {% endblock %}
+
 
   
   </form>
