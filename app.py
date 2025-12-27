@@ -56,36 +56,78 @@ def init_db():
 # --------------------
 # ルーティング
 # --------------------
-@app.route("/")
-def index():
-    return redirect("/login")
+@app.route("/record", methods=["GET", "POST"])
+def record():
+    if "user_id" not in session:
+        return redirect("/login")
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
+    # POST（保存）
     if request.method == "POST":
-        nickname = request.form.get("nickname")
-        password = request.form.get("password")
+        record_date = request.form.get("record_date")
+        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%a")
 
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
-        user = cur.fetchone()
 
-        if not user:
-            cur.execute(
-                "INSERT INTO users (nickname, password) VALUES (%s, %s)",
-                (nickname, password)
-            )
-            conn.commit()
-            cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
-            user = cur.fetchone()
+        cur.execute(
+            "SELECT id FROM records WHERE user_id=%s AND date=%s",
+            (session["user_id"], record_date)
+        )
+        existing = cur.fetchone()
 
-        session["user_id"] = user["id"]
+        if existing:
+            cur.execute("""
+                UPDATE records
+                SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
+                WHERE user_id=%s AND date=%s
+            """, (
+                request.form.get("weather"),
+                request.form.get("score"),
+                request.form.get("good1"),
+                request.form.get("good2"),
+                request.form.get("good3"),
+                session["user_id"],
+                record_date
+            ))
+        else:
+            cur.execute("""
+                INSERT INTO records
+                (user_id, date, weekday, weather, score, good1, good2, good3)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                session["user_id"],
+                record_date,
+                weekday,
+                request.form.get("weather"),
+                request.form.get("score"),
+                request.form.get("good1"),
+                request.form.get("good2"),
+                request.form.get("good3")
+            ))
+
+        conn.commit()
         cur.close()
         conn.close()
-        return redirect("/record")
+        return redirect(f"/record?date={record_date}")
 
-    return render_template("login.html")
+    # GET（表示）
+    date_str = request.args.get("date") or date.today().strftime("%Y-%m-%d")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM records WHERE user_id=%s AND date=%s",
+        (session["user_id"], date_str)
+    )
+    record = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "record.html",
+        record=record,
+        date=date_str
+    )
 
 # --------------------
 # 記録画面
