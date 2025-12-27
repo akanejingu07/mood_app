@@ -19,7 +19,8 @@ def get_db_connection():
     return psycopg2.connect(
         database_url,
         cursor_factory=RealDictCursor,
-        sslmode="require"
+        sslmode="require",
+        connect_timeout=5
     )
 
 # --------------------
@@ -55,16 +56,6 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
-
-# --------------------
-# 初回アクセス時にDB初期化
-# --------------------
-@app.before_request
-def before_request():
-    if not getattr(app, "_db_initialized", False):
-        init_db()
-        app._db_initialized = True
-
 # --------------------
 # ルーティング
 # --------------------
@@ -258,8 +249,11 @@ def calendar_view():
         days=days
     )
 
-
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
+
+if __name__ == "__main__":
+    init_db()
+    app.run(debug=True)
