@@ -213,7 +213,7 @@ def calendar_view():
     for d in month_days:
         days.append({
             "day": d.day,
-            "date": d.strftime("%Y-%m-%d"),
+            "date": d.strftime("%Y-%m-%d"),  # ← これを追加
             "in_month": d.month == month,
             "score": score_map.get(d)
         })
