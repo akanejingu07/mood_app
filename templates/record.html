@@ -2,7 +2,13 @@
 {% block title %}今日の記録{% endblock %}
 
 {% block content %}
-<h2>{{ date }} ({{ weekday }}) の記録</h2>
+<h2>
+  {% if edit %}
+    {{ record.date.strftime("%Y-%m-%d") }}の記録
+  {% else %}
+    今日の記録
+  {% endif %}
+</h2>
 
 <form method="POST">
   <input type="hidden" name="record_date" value="{{ date }}">

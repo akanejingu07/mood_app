@@ -1,42 +1,27 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>記録一覧</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
-  <div class="container">
-
-    <h1>これまでの記録</h1>
-
-    <p>
-      <a href="/calendar">カレンダーで見る</a>
-    </p>
-    
-    {% if records|length == 0 %}
-      <p>まだ記録がありません。</p>
-    {% endif %}
-
+{% extends "base.html" %}
+{% block content %}
+<h2>履歴</h2>
+<table>
+  <thead>
+    <tr>
+      <th>日付</th>
+      <th>スコア</th>
+      <th>天気</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for r in records %}
-  <tr>
-    <td>{{ r.date }}</td>
-    <td>{{ r.score }}</td>
-    <td>{{ r.weather }}</td>
-    <td>
-      <a href="{{ url_for('edit', record_id=r.id) }}">編集</a>
-    </td>
-  </tr>
-  {% endfor %}
-
-    <p>
-      <a href="/record">記録画面に戻る</a>
-    </p>
-
-  </div>
-
-</body>
-</html>
-
+    <tr>
+      <td>{{ r.date.strftime("%Y-%m-%d") }}</td>
+      <td>{{ r.score }}</td>
+      <td>{{ r.weather }}</td>
+      <td><a href="{{ url_for('edit', record_id=r.id) }}">編集</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p>
+  <a href="/record">記録画面に戻る</a>
+</p>
+{% endblock %}
