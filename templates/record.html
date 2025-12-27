@@ -1,69 +1,37 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>今日の記録</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-  <div class="container">
-  <h1>今日の気分記録</h1>
-  <form method="post">
+{% extends "base.html" %}
 
-    <!-- 日付 -->
-    <div class="field">
-      <label>
-        記録する日付
-        <input
-          type="date"
-          name="record_date"
-          id="recordDate"
-          value="{{ record.date if edit else date }}"
-        >
-      </label>
-    </div>
-  
-    <!-- 表示用日付 -->
-    <p class="date" id="dateDisplay">
-      {% if edit %}
-        {{ record.date }}（{{ record.weekday }}）
-      {% else %}
-        {{ date }}（{{ weekday }}）
-      {% endif %}
-    </p>
+{% block content %}
+<h2>{{ date }} ({{ weekday }})</h2>
 
-    <!-- 天気 -->
-    <div class="field">
-      <label>今日の天気</label><br>
-      <select name="weather">
-        <option value="">選択しない</option>
-        <option value="晴れ" {% if edit and record.weather == "晴れ" %}selected{% endif %}>晴れ</option>
-        <option value="くもり" {% if edit and record.weather == "くもり" %}selected{% endif %}>くもり</option>
-        <option value="雨" {% if edit and record.weather == "雨" %}selected{% endif %}>雨</option>
-        <option value="雪" {% if edit and record.weather == "雪" %}selected{% endif %}>雪</option>
-     </select>
-    </div>  
+<form method="POST" action="/record">
+  <!-- カレンダーから日付が渡る -->
+  <input type="hidden" name="record_date" value="{{ date }}">
 
-    <!-- 点数 -->
-    <input type="range" name="score" min="1" max="10"
-          value="{{ record.score if edit else 5 }}"
-          oninput="scoreValue.textContent = this.value">
-    <span id="scoreValue">
-      {{ record.score if edit else 5 }}
-    </span>
+  <label>天気:
+    <input type="text" name="weather" value="{{ record.weather if record else '' }}">
+  </label><br>
 
-    <!-- よかったこと -->
-    <textarea name="good1" rows="2">{{ record.good1 if record else '' }}</textarea>
-    <textarea name="good2" rows="2">{{ record.good1 if record else '' }}</textarea>
-    <textarea name="good3" rows="2">{{ record.good1 if record else '' }}</textarea>
+  <label>スコア:
+    <input type="number" name="score" value="{{ record.score if record else '' }}" min="0" max="10">
+  </label><br>
 
-    <!-- ★ここが重要 -->
-    <button type="submit">
-     {% if edit %}更新する{% else %}保存する{% endif %}
-    </button>
+  <label>良かったこと1:
+    <input type="text" name="good1" value="{{ record.good1 if record else '' }}">
+  </label><br>
 
-  </form>
+  <label>良かったこと2:
+    <input type="text" name="good2" value="{{ record.good2 if record else '' }}">
+  </label><br>
+
+  <label>良かったこと3:
+    <input type="text" name="good3" value="{{ record.good3 if record else '' }}">
+  </label><br>
+
+  <button type="submit">{{ '更新' if edit else '保存' }}</button>
+</form>
+
+{% endblock %}
+
 
 <!-- 削除フォーム（完全に別） -->
 {% if edit %}

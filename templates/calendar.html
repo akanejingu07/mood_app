@@ -3,25 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>calendar</title>
+  <title>カレンダー</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
 </head>
 <body>
-<div class="calendar-grid">
-  {% for d in days %}
-    <div class="
-      day-cell
-      {% if not d.in_month %}out{% endif %}
-      {% if d.score is not none %}score-{{ d.score }}{% endif %}
-    ">
-    <a href="{{ url_for('record') }}?date={{ d.date }}">
-      {{ d.day }}
-    </a>        
-      {% if d.score is not none %}
-        <div class="score">{{ d.score }}</div>
-      {% endif %}
-    </div>
-  {% endfor %}
-</div>
+  <header>
+    <h1>気分記録アプリ カレンダー</h1>
+    <nav>
+      <a href="/record">今日の記録</a> |
+      <a href="/history">履歴</a> |
+      <a href="/logout">ログアウト</a>
+    </nav>
+  </header>
+
+  <div class="calendar-grid">
+    {% for d in days %}
+      <div class="day-cell
+                  {% if not d.in_month %}out{% endif %}
+                  {% if d.score is not none %}score-{{ d.score }}{% endif %}">
+        <!-- 日付リンク -->
+        <a href="{{ url_for('record') }}?date={{ d.day | string | safe }}-{{ d.in_month | string | safe }}">
+          {{ d.day }}
+        </a>
+        {% if d.score is not none %}
+          <div class="score">{{ d.score }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
 </body>
 </html>
