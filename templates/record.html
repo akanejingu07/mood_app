@@ -54,9 +54,9 @@
     </span>
 
     <!-- よかったこと -->
-    <textarea name="good1">{{ record.good1 if edit }}</textarea>
-    <textarea name="good2">{{ record.good2 if edit }}</textarea>
-    <textarea name="good3">{{ record.good3 if edit }}</textarea>
+    <textarea name="good1" rows="2">{{ record.good1 if record else '' }}</textarea>
+    <textarea name="good2" rows="2">{{ record.good1 if record else '' }}</textarea>
+    <textarea name="good3" rows="2">{{ record.good1 if record else '' }}</textarea>
 
     <!-- ★ここが重要 -->
     <button type="submit">

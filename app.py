@@ -28,7 +28,6 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
-
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -36,7 +35,6 @@ def init_db():
         password TEXT NOT NULL
     );
     """)
-
     cur.execute("""
     CREATE TABLE IF NOT EXISTS records (
         id SERIAL PRIMARY KEY,
@@ -48,11 +46,9 @@ def init_db():
         good1 TEXT,
         good2 TEXT,
         good3 TEXT,
-        UNIQUE (user_id, date),
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
-
     conn.commit()
     cur.close()
     conn.close()
@@ -72,11 +68,11 @@ def login():
 
         conn = get_db_connection()
         cur = conn.cursor()
-
         cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
         user = cur.fetchone()
 
         if not user:
+            # 新規登録
             cur.execute(
                 "INSERT INTO users (nickname, password) VALUES (%s, %s)",
                 (nickname, password)
@@ -86,28 +82,36 @@ def login():
             user = cur.fetchone()
 
         session["user_id"] = user["id"]
-
         cur.close()
         conn.close()
-        return redirect("/calendar")
+        return redirect("/record")
 
     return render_template("login.html")
 
-# --------------------
-# 記録画面（新規・編集共通）
-# --------------------
 @app.route("/record", methods=["GET", "POST"])
 def record():
     if "user_id" not in session:
         return redirect("/login")
 
-    if request.method == "POST":
-        record_date = request.form.get("record_date")
-        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
+    record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
+    weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
 
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM records
+        WHERE user_id=%s AND date=%s
+    """, (session["user_id"], record_date))
+    record = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    edit = record is not None
+
+    if request.method == "POST":
+        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
         conn = get_db_connection()
         cur = conn.cursor()
-
         # 既存チェック
         cur.execute("""
             SELECT id FROM records
@@ -119,11 +123,7 @@ def record():
             # 更新
             cur.execute("""
                 UPDATE records
-                SET weather=%s,
-                    score=%s,
-                    good1=%s,
-                    good2=%s,
-                    good3=%s
+                SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
                 WHERE user_id=%s AND date=%s
             """, (
                 request.form.get("weather"),
@@ -156,32 +156,30 @@ def record():
         conn.close()
         return redirect("/calendar")
 
-    # -------- GET --------
-    record_date = request.args.get("date") or date.today().strftime("%Y-%m-%d")
-    weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM records
-        WHERE user_id=%s AND date=%s
-    """, (session["user_id"], record_date))
-    record = cur.fetchone()
-
-    cur.close()
-    conn.close()
-
     return render_template(
         "record.html",
         record=record,
         date=record_date,
         weekday=weekday,
-        edit=record is not None
+        edit=edit
     )
 
-# --------------------
-# カレンダー
-# --------------------
+@app.route("/history")
+def history():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM records WHERE user_id=%s ORDER BY date DESC",
+        (session["user_id"],)
+    )
+    records = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template("history.html", records=records)
+
 @app.route("/calendar")
 def calendar_view():
     if "user_id" not in session:
@@ -190,7 +188,6 @@ def calendar_view():
     today = date.today()
     year = today.year
     month = today.month
-
     cal = calendar.Calendar(firstweekday=6)
     month_days = list(cal.itermonthdates(year, month))
 
@@ -204,18 +201,20 @@ def calendar_view():
     cur.close()
     conn.close()
 
+    # 日付文字列をキーに変換
     score_map = {}
     for r in rows:
-        binary = 1 if r["score"] is not None and r["score"] >= 5 else 0
-        score_map[r["date"]] = binary
+        key = r["date"].strftime("%Y-%m-%d")
+        score_map[key] = 1 if r["score"] is not None and r["score"] >= 5 else 0
 
     days = []
     for d in month_days:
+        day_str = d.strftime("%Y-%m-%d")
         days.append({
             "day": d.day,
-            "date": d.strftime("%Y-%m-%d"),  # ← これを追加
             "in_month": d.month == month,
-            "score": score_map.get(d)
+            "date_str": day_str,
+            "score": score_map.get(day_str)
         })
 
     return render_template(
@@ -225,9 +224,6 @@ def calendar_view():
         days=days
     )
 
-# --------------------
-# ログアウト
-# --------------------
 @app.route("/logout")
 def logout():
     session.clear()
