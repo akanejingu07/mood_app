@@ -95,7 +95,9 @@ def record():
     if "user_id" not in session:
         return redirect("/login")
 
-    # POST（保存・更新）
+    # --------------------
+    # POST（保存）
+    # --------------------
     if request.method == "POST":
         record_date = request.form.get("record_date")
         weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
@@ -104,7 +106,8 @@ def record():
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT id FROM records WHERE user_id=%s AND date=%s
+            SELECT id FROM records
+            WHERE user_id=%s AND date=%s
         """, (session["user_id"], record_date))
         existing = cur.fetchone()
 
@@ -141,29 +144,31 @@ def record():
         conn.commit()
         cur.close()
         conn.close()
+
         return redirect(f"/record?date={record_date}")
 
-    # GET（表示）
+    # --------------------
+    # GET（表示）← ここが重要
+    # --------------------
     record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
     weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
 
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT * FROM records WHERE user_id=%s AND date=%s
+        SELECT * FROM records
+        WHERE user_id=%s AND date=%s
     """, (session["user_id"], record_date))
     record = cur.fetchone()
     cur.close()
     conn.close()
-
-    edit = record is not None
 
     return render_template(
         "record.html",
         record=record,
         date=record_date,
         weekday=weekday,
-        edit=edit
+        edit=record is not None
     )
 
 # --------------------
