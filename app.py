@@ -23,7 +23,7 @@ def get_db_connection():
     )
 
 # --------------------
-# 初期テーブル作成
+# 初期テーブル作成（手動実行推奨）
 # --------------------
 def init_db():
     conn = get_db_connection()
@@ -87,12 +87,15 @@ def login():
 
     return render_template("login.html")
 
+# --------------------
+# 記録画面
+# --------------------
 @app.route("/record", methods=["GET", "POST"])
 def record():
     if "user_id" not in session:
         return redirect("/login")
 
-    # POST 時（保存）
+    # POST（保存・更新）
     if request.method == "POST":
         record_date = request.form.get("record_date")
         weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
@@ -100,15 +103,12 @@ def record():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # 既存チェック
         cur.execute("""
-            SELECT id FROM records
-            WHERE user_id=%s AND date=%s
+            SELECT id FROM records WHERE user_id=%s AND date=%s
         """, (session["user_id"], record_date))
         existing = cur.fetchone()
 
         if existing:
-            # 更新
             cur.execute("""
                 UPDATE records
                 SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
@@ -123,7 +123,6 @@ def record():
                 record_date
             ))
         else:
-            # 新規
             cur.execute("""
                 INSERT INTO records
                 (user_id, date, weekday, weather, score, good1, good2, good3)
@@ -142,17 +141,16 @@ def record():
         conn.commit()
         cur.close()
         conn.close()
-        return redirect(f"/record?date={record_date}")  # 保存後に同じ日付を表示
+        return redirect(f"/record?date={record_date}")
 
-    # GET 時（表示）
+    # GET（表示）
     record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
     weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
 
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-        SELECT * FROM records
-        WHERE user_id=%s AND date=%s
+        SELECT * FROM records WHERE user_id=%s AND date=%s
     """, (session["user_id"], record_date))
     record = cur.fetchone()
     cur.close()
@@ -168,6 +166,9 @@ def record():
         edit=edit
     )
 
+# --------------------
+# 編集画面（historyカードから）
+# --------------------
 @app.route("/edit/<int:record_id>", methods=["GET", "POST"])
 def edit(record_id):
     if "user_id" not in session:
@@ -185,24 +186,19 @@ def edit(record_id):
 
     if request.method == "POST":
         record_date = request.form.get("record_date")
-        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
-
         cur.execute("""
             UPDATE records
-            SET date=%s, weekday=%s, weather=%s, score=%s, good1=%s, good2=%s, good3=%s
-            WHERE id=%s AND user_id=%s
-            """, (
-        record_date,
-        weekday,
-        request.form.get("weather"),
-        request.form.get("score"),
-        request.form.get("good1"),
-        request.form.get("good2"),
-        request.form.get("good3"),
-        record_id,
-        session["user_id"]
+            SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
+            WHERE user_id=%s AND date=%s
+        """, (
+            request.form.get("weather"),
+            request.form.get("score"),
+            request.form.get("good1"),
+            request.form.get("good2"),
+            request.form.get("good3"),
+            session["user_id"],
+            record_date
         ))
-
         conn.commit()
         cur.close()
         conn.close()
@@ -212,6 +208,9 @@ def edit(record_id):
     conn.close()
     return render_template("record.html", edit=True, record=record)
 
+# --------------------
+# 履歴
+# --------------------
 @app.route("/history")
 def history():
     if "user_id" not in session:
@@ -226,12 +225,14 @@ def history():
 
     return render_template("history.html", records=records)
 
+# --------------------
+# カレンダー
+# --------------------
 @app.route("/calendar")
 def calendar_view():
     if "user_id" not in session:
         return redirect("/login")
 
-    # GET パラメータから年月を取得、なければ今日
     today = date.today()
     year = request.args.get("year", type=int) or today.year
     month = request.args.get("month", type=int) or today.month
@@ -241,15 +242,11 @@ def calendar_view():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT date, score FROM records WHERE user_id=%s",
-        (session["user_id"],)
-    )
+    cur.execute("SELECT date, score FROM records WHERE user_id=%s", (session["user_id"],))
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
-    # スコアマップ
     score_map = {r["date"]: 1 if r["score"] and r["score"] >= 5 else 0 for r in rows}
 
     days = []
@@ -260,7 +257,6 @@ def calendar_view():
             "score": score_map.get(d)
         })
 
-    # 前月・次月のリンク
     prev_month = month - 1 or 12
     prev_year = year if month > 1 else year - 1
     next_month = month + 1 if month < 12 else 1
@@ -277,11 +273,14 @@ def calendar_view():
         next_month=next_month
     )
 
+# --------------------
+# ログアウト
+# --------------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
 if __name__ == "__main__":
-    init_db()
+    # デバッグ起動用のみ
     app.run(debug=True)

@@ -57,7 +57,6 @@ button, input[type="submit"] {
 .btn {
   display: inline-block;
   background-color: #4caf50; /* 緑基調 */
-  color: #fff;
   text-decoration: none; /* 下線を消す */
   padding: 8px 16px;
   border-radius: 8px;
@@ -94,7 +93,6 @@ select {
 }
 
 .record-form {
-  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   padding: 16px;
@@ -265,7 +263,6 @@ input[type=range]::-moz-range-thumb {
   right: 4px;
   font-size: 0.8rem;
   background-color: #3a8d3a;
-  color: white;
   border-radius: 50%;
   width: 20px;
   height: 20px;
