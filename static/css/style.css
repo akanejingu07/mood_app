@@ -1,244 +1,171 @@
-/* --- 共通 --- */
+/* ---------------------------
+   共通スタイル
+--------------------------- */
 body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background-color: #e6f2e6; /* 薄緑 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f9f9f9;
   margin: 0;
   padding: 0;
-  color: #333;
-  font-size: 16px;
 }
 
-/* ヘッダー */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------------------------
+ ヘッダー
+--------------------------- */
 header {
-  background-color: #4caf50;
+  background-color: #3a8d3a;
   color: white;
-  padding: 1rem 2rem;
+  padding: 16px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
 }
 
 header nav a {
-  color: white;
-  text-decoration: none;
-  margin: 0 1rem;
+  margin: 0 8px;
+  font-size: 0.9rem;
 }
 
-header nav a:hover {
-  text-decoration: underline;
-}
-
-/* main */
-main {
-  padding: 1rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-/* historyカードコンテナ */
-.history-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-/* カードリンク */
-.history-card {
-  display: block;
-  background-color: #f0fff0; /* 薄緑系 */
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s, box-shadow 0.2s;
-  padding: 1rem;
-}
-
-.history-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-/* カード内 */
-.card-header {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 0.5rem;
-}
-
-.card-body {
-  font-size: 14px;
-}
-
-.card-item {
-  margin-bottom: 0.3rem;
-}
-
-/* ボタン風リンク（必要なら） */
-a.button {
-  display: inline-block;
-  background-color: #4caf50;
-  color: white;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-
-a.button:hover {
-  background-color: #45a049;
-}
-
-/* --- レスポンシブ --- */
-@media (max-width: 600px) {
-  .history-container {
-    grid-template-columns: 1fr;
-  }
-  body {
-    font-size: 15px;
-  }
-  .card-header {
-    font-size: 15px;
-  }
-  .card-body {
-    font-size: 13px;
-  }
-}
-
-/* recordカード */
-.record-card {
-  background-color: #f0fff0; /* 薄緑 */
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  max-width: 500px;
-  margin: 1rem auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  font-size: 14px;
-}
-
-.form-group input,
-.form-group select {
-  padding: 0.4rem 0.5rem;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.button {
-  background-color: #4caf50;
+/* ---------------------------
+ ボタン
+--------------------------- */
+button, input[type="submit"] {
+  background-color: #3a8d3a;
   color: white;
   border: none;
-  padding: 0.6rem 1rem;
   border-radius: 8px;
-  font-size: 16px;
+  padding: 8px 16px;
   cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background-color 0.2s;
+  font-size: 16px;
 }
 
-.button:hover {
-  background-color: #45a049;
+button:hover, input[type="submit"]:hover {
+  background-color: #2f6f2f;
 }
 
-/* レスポンシブ */
-@media (max-width: 600px) {
-  .record-card {
-    padding: 0.8rem;
-  }
-  .form-group input,
-  .form-group select {
-    font-size: 13px;
-  }
-  .button {
-    font-size: 15px;
-  }
+/* ---------------------------
+ フォーム
+--------------------------- */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  font-size: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
 }
-.history-container {
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* ---------------------------
+ 履歴カード（history.html）
+--------------------------- */
+.history-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin: 1rem;
+  gap: 12px;
+  padding: 16px;
 }
 
 .history-card {
-  background-color: #f0fff0; /* 薄緑 */
-  padding: 1rem;
+  background-color: #e6f4ea;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
 }
 
-.history-card:hover {
-  transform: translateY(-2px);
+.history-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #333;
 }
 
-.history-date {
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  font-size: 16px;
+.history-card p, 
+.history-card li {
+  margin: 4px 0;
+  color: #555;
 }
 
-.history-score,
-.history-weather {
-  font-size: 14px;
-  margin-bottom: 0.2rem;
+.history-card ul {
+  padding-left: 16px;
+  margin: 0;
 }
 
-.history-good {
-  list-style-type: disc;
-  padding-left: 20px;
-  margin: 0.3rem 0 0 0;
-  font-size: 14px;
+/* ---------------------------
+ カレンダー（calendar.html）
+--------------------------- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 16px;
 }
 
-.calendar-link {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.calendar-link a {
-  display: inline-block;
-  background-color: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
+.day-cell {
   border-radius: 8px;
-  text-decoration: none;
-  font-size: 16px;
-  transition: background-color 0.2s;
+  background-color: #e6f4ea;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  position: relative;
+  cursor: pointer;
 }
 
-.calendar-link a:hover {
-  background-color: #45a049;
+.day-cell.out {
+  background-color: #f0f0f0;
+  color: #aaa;
 }
 
-/* レスポンシブ */
-@media (max-width: 600px) {
+.day-cell .score {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 0.8rem;
+  background-color: #3a8d3a;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+/* ---------------------------
+ レスポンシブ
+--------------------------- */
+@media screen and (max-width: 768px) {
+  header nav {
+      font-size: 0.8rem;
+  }
+
   .history-card {
-    padding: 0.8rem;
+      min-height: auto;
+      padding: 12px;
   }
-  .history-date {
-    font-size: 15px;
-  }
-  .history-score,
-  .history-weather,
-  .history-good {
-    font-size: 13px;
-  }
-  .calendar-link a {
-    font-size: 15px;
-    padding: 0.4rem 0.8rem;
+
+  .day-cell {
+      padding: 8px 0;
+      font-size: 0.8rem;
   }
 }
