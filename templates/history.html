@@ -21,29 +21,15 @@
     {% endif %}
 
     {% for r in records %}
-  <a href="/edit/{{ r.id }}" style="text-decoration:none; color:inherit;">
-    <div class="card">
-
-      <div class="card-date">
-        {{ r.date }}（{{ r.weekday }}）
-      </div>
-
-      <div class="card-meta">
-        天気：{{ r.weather or "―" }}　
-        点数：{{ r.score }}
-      </div>
-
-      <div class="card-good">
-        <ul>
-          {% if r.good1 %}<li>{{ r.good1 }}</li>{% endif %}
-          {% if r.good2 %}<li>{{ r.good2 }}</li>{% endif %}
-          {% if r.good3 %}<li>{{ r.good3 }}</li>{% endif %}
-        </ul>
-      </div>
-
-    </div>
-  </a>
-{% endfor %}
+  <tr>
+    <td>{{ r.date }}</td>
+    <td>{{ r.score }}</td>
+    <td>{{ r.weather }}</td>
+    <td>
+      <a href="{{ url_for('edit', record_id=r.id) }}">編集</a>
+    </td>
+  </tr>
+  {% endfor %}
 
     <p>
       <a href="/record">記録画面に戻る</a>
