@@ -287,6 +287,10 @@ input[type=range]::-moz-range-thumb {
 /* ---------------------------
  カレンダー（calendar.html）
 --------------------------- */
+.calendar-card-wrapper {
+  padding: 16px;
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

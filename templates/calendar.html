@@ -8,17 +8,18 @@
   <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}">次月 →</a>
 </div>
 
-
-<div class="calendar-grid">
-  {% for d in days %}
-    <div class="day-cell {% if not d.in_month %}out{% endif %} {% if d.score is not none %}score-{{ d.score }}{% endif %}">
-      <a href="{{ url_for('record') }}?date={{ d.date_str }}">
-        {{ d.day }}
-      </a>
-      {% if d.score is not none %}
-        <div class="score">{{ d.score }}</div>
-      {% endif %}
-    </div>
-  {% endfor %}
+<div class="calendar-card-wrapper">
+  <div class="calendar-grid">
+    {% for d in days %}
+      <div class="day-cell {% if not d.in_month %}out{% endif %} {% if d.score is not none %}score-{{ d.score }}{% endif %}">
+        <a href="{{ url_for('record') }}?date={{ d.date_str }}">
+          {{ d.day }}
+        </a>
+        {% if d.score is not none %}
+          <div class="score">{{ d.score }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% endblock %}
 </div>
-{% endblock %}
