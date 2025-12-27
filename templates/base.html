@@ -6,7 +6,6 @@
   <title>{% block title %}mood_app{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <input type="text" name="good1" ... autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 </head>
 <body>
 
@@ -24,6 +23,8 @@
 
   <main>
     {% block content %}
+    <input type="text" name="good1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <input type="submit" value="保存">
     {% endblock %}
   </main>
 

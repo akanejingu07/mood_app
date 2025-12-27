@@ -8,7 +8,7 @@ body {
   color: #333;
   background-color: #f9f9f9;
   margin: 0;
-  padding: 0;
+  padding: 0 12px;
 }
 
 a {
@@ -16,11 +16,17 @@ a {
   text-decoration: none;
 }
 
+main {
+  max-width: 600px; /* スマホでも中央に収める */
+  margin: 0 auto;
+  padding: 16px 0;
+}
+
 /* ---------------------------
  ヘッダー
 --------------------------- */
 header {
-  background-color: #3a8d3a;
+  background-color: #63b063;
   color: white;
   padding: 16px;
   text-align: center;
@@ -40,7 +46,7 @@ header nav a {
  ボタン
 --------------------------- */
 button, input[type="submit"] {
-  background-color: #3a8d3a;
+  background-color: #529a52;
   color: white;
   border: none;
   border-radius: 8px;
@@ -50,7 +56,7 @@ button, input[type="submit"] {
 }
 
 button:hover, input[type="submit"]:hover {
-  background-color: #2f6f2f;
+  background-color: #529a52;
 }
 
 /* ---------------------------
@@ -93,6 +99,7 @@ select {
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  margin-bottom: 12px;
   min-height: 120px;
 }
 
@@ -110,7 +117,12 @@ select {
 
 .history-card ul {
   padding-left: 16px;
-  margin: 0;
+  margin: 8px 0 0 0;
+}
+
+.history-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* ---------------------------
@@ -155,17 +167,23 @@ select {
  レスポンシブ
 --------------------------- */
 @media screen and (max-width: 768px) {
-  header nav {
-      font-size: 0.8rem;
+  body {
+    padding: 0 8px;
+  }
+
+  main {
+    padding: 12px 0;
   }
 
   .history-card {
-      min-height: auto;
-      padding: 12px;
+    padding: 12px;
   }
 
-  .day-cell {
-      padding: 8px 0;
-      font-size: 0.8rem;
+  .history-card h3 {
+    font-size: 15px;
+  }
+
+  .history-card p, .history-card li {
+    font-size: 13px;
   }
 }
