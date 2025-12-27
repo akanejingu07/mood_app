@@ -185,19 +185,24 @@ def edit(record_id):
 
     if request.method == "POST":
         record_date = request.form.get("record_date")
+        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
+
         cur.execute("""
             UPDATE records
-            SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
-            WHERE user_id=%s AND date=%s
-        """, (
-            request.form.get("weather"),
-            request.form.get("score"),
-            request.form.get("good1"),
-            request.form.get("good2"),
-            request.form.get("good3"),
-            session["user_id"],
-            record_date
+            SET date=%s, weekday=%s, weather=%s, score=%s, good1=%s, good2=%s, good3=%s
+            WHERE id=%s AND user_id=%s
+            """, (
+        record_date,
+        weekday,
+        request.form.get("weather"),
+        request.form.get("score"),
+        request.form.get("good1"),
+        request.form.get("good2"),
+        request.form.get("good3"),
+        record_id,
+        session["user_id"]
         ))
+
         conn.commit()
         cur.close()
         conn.close()
