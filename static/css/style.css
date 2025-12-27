@@ -290,8 +290,7 @@ input[type=range]::-moz-range-thumb {
 .calendar-card-wrapper {
   background-color: #fff;
   border-radius: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding: 12px;
 }
 
 .calendar-grid {
