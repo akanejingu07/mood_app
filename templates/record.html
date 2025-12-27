@@ -11,9 +11,11 @@
     </div>
 
     <div class="form-group">
-      <label for="score">スコア</label>
-      <input type="number" id="score" name="score" min="0" max="10"
-             value="{{ edit and record.score or '' }}">
+      <label for="score">気分スコア</label>
+      <div class="score-slider-wrapper">
+        <input type="range" id="score" name="score" min="0" max="10" value="{{ record.score if record else 5 }}">
+        <span id="score-value">{{ record.score if record else 5 }}</span>
+      </div>
     </div>
 
     <div class="form-group">
@@ -43,34 +45,18 @@
   </div>
 </form>
 
+<p>
+  <a href="/history">これまでの記録を見る</a> |
+  <a href="/calendar">カレンダーを見る</a> |
+  <a href="/logout">ログアウト</a>
+</p>
+
+<script>
+  const slider = document.getElementById("score");
+  const output = document.getElementById("score-value");
+  slider.addEventListener("input", () => {
+    output.textContent = slider.value;
+  });
+</script>
+
 {% endblock %}
-
-
-  
-  </form>
-  <p>
-    <a href="/history">これまでの記録を見る</a>
-  </p>
-  
-  <p>
-    <a href="/logout">ログアウト</a>
-  </p>
-  </div>
-  <script>
-    const dateInput = document.getElementById("recordDate");
-    const dateDisplay = document.getElementById("dateDisplay");
-  
-    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  
-    dateInput.addEventListener("change", () => {
-      if (!dateInput.value) return;
-  
-      const d = new Date(dateInput.value);
-      const weekday = weekdays[d.getDay()];
-  
-      dateDisplay.textContent = `${dateInput.value}（${weekday}）`;
-    });
-  </script>
-  
-</body>
-</html>
