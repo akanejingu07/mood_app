@@ -68,6 +68,66 @@ button, input[type="submit"] {
 button:hover, input[type="submit"]:hover {
   background-color: #529a52;
 }
+/* 記録カード */
+.record-card {
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin: 16px 0;
+}
+
+/* フォームグループ */
+.record-card .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.record-card label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.record-card input[type="text"],
+.record-card input[type="date"],
+.record-card select,
+.record-card input[type="range"] {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #4caf50;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* ボタン */
+.record-card .button {
+  width: 100%;
+  background-color: #529a52;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.record-card .button:hover {
+  background-color: #4caf50;
+}
+
+/* スライダー */
+.score-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#score-value {
+  font-weight: bold;
+  width: 24px;
+  text-align: center;
+}
 
 /* ---------------------------
  フォーム
