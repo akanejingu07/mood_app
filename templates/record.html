@@ -1,36 +1,35 @@
 {% extends "base.html" %}
+{% block title %}今日の記録{% endblock %}
 
 {% block content %}
-<h2>{{ date }} ({{ weekday }})</h2>
+<h2>{{ date }} ({{ weekday }}) の記録</h2>
 
-<form method="POST" action="/record">
-  <!-- カレンダーから日付が渡る -->
+<form method="POST">
   <input type="hidden" name="record_date" value="{{ date }}">
 
-  <label>天気:
-    <input type="text" name="weather" value="{{ record.weather if record else '' }}">
-  </label><br>
+  <label>天気</label>
+  <select name="weather">
+    {% for w in weather_options %}
+      <option value="{{ w }}" {% if record and record.weather == w %}selected{% endif %}>{{ w }}</option>
+    {% endfor %}
+  </select>
 
-  <label>スコア:
-    <input type="number" name="score" value="{{ record.score if record else '' }}" min="0" max="10">
-  </label><br>
+  <label>気分スコア (0-10)</label>
+  <input type="number" name="score" min="0" max="10" value="{{ record.score if record else '' }}">
 
-  <label>良かったこと1:
-    <input type="text" name="good1" value="{{ record.good1 if record else '' }}">
-  </label><br>
+  <label>良かったこと1</label>
+  <input type="text" name="good1" value="{{ record.good1 if record else '' }}">
 
-  <label>良かったこと2:
-    <input type="text" name="good2" value="{{ record.good2 if record else '' }}">
-  </label><br>
+  <label>良かったこと2</label>
+  <input type="text" name="good2" value="{{ record.good2 if record else '' }}">
 
-  <label>良かったこと3:
-    <input type="text" name="good3" value="{{ record.good3 if record else '' }}">
-  </label><br>
+  <label>良かったこと3</label>
+  <input type="text" name="good3" value="{{ record.good3 if record else '' }}">
 
-  <button type="submit">{{ '更新' if edit else '保存' }}</button>
+  <button type="submit">保存</button>
 </form>
-
 {% endblock %}
+
 
 
 <!-- 削除フォーム（完全に別） -->

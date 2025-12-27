@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, session
 import os
 import psycopg2
-import calendar
-from datetime import date, datetime
 from psycopg2.extras import RealDictCursor
+from datetime import datetime, date
+import calendar
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
@@ -72,11 +72,7 @@ def login():
         user = cur.fetchone()
 
         if not user:
-            # 新規登録
-            cur.execute(
-                "INSERT INTO users (nickname, password) VALUES (%s, %s)",
-                (nickname, password)
-            )
+            cur.execute("INSERT INTO users (nickname, password) VALUES (%s, %s)", (nickname, password))
             conn.commit()
             cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
             user = cur.fetchone()
@@ -93,75 +89,59 @@ def record():
     if "user_id" not in session:
         return redirect("/login")
 
-    record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
-    weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
-
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM records
-        WHERE user_id=%s AND date=%s
-    """, (session["user_id"], record_date))
-    record = cur.fetchone()
-    cur.close()
-    conn.close()
 
+    # GET または POST で日付取得
+    if request.method == "POST":
+        record_date = request.form.get("record_date")
+    else:
+        record_date = request.args.get("date") or datetime.now().strftime("%Y-%m-%d")
+
+    weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
+
+    # 既存レコードを取得
+    cur.execute("SELECT * FROM records WHERE user_id=%s AND date=%s", (session["user_id"], record_date))
+    record = cur.fetchone()
     edit = record is not None
 
     if request.method == "POST":
-        weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%A")
-        conn = get_db_connection()
-        cur = conn.cursor()
-        # 既存チェック
-        cur.execute("""
-            SELECT id FROM records
-            WHERE user_id=%s AND date=%s
-        """, (session["user_id"], record_date))
-        existing = cur.fetchone()
+        weather = request.form.get("weather")
+        score = request.form.get("score")
+        good1 = request.form.get("good1")
+        good2 = request.form.get("good2")
+        good3 = request.form.get("good3")
 
-        if existing:
-            # 更新
+        if edit:
             cur.execute("""
                 UPDATE records
                 SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
                 WHERE user_id=%s AND date=%s
-            """, (
-                request.form.get("weather"),
-                request.form.get("score"),
-                request.form.get("good1"),
-                request.form.get("good2"),
-                request.form.get("good3"),
-                session["user_id"],
-                record_date
-            ))
+            """, (weather, score, good1, good2, good3, session["user_id"], record_date))
         else:
-            # 新規
             cur.execute("""
-                INSERT INTO records
-                (user_id, date, weekday, weather, score, good1, good2, good3)
+                INSERT INTO records (user_id, date, weekday, weather, score, good1, good2, good3)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                session["user_id"],
-                record_date,
-                weekday,
-                request.form.get("weather"),
-                request.form.get("score"),
-                request.form.get("good1"),
-                request.form.get("good2"),
-                request.form.get("good3")
-            ))
+            """, (session["user_id"], record_date, weekday, weather, score, good1, good2, good3))
 
         conn.commit()
         cur.close()
         conn.close()
         return redirect("/calendar")
 
+    cur.close()
+    conn.close()
+
+    # 天気プルダウン選択肢
+    weather_options = ["晴れ", "曇り", "雨", "雪", "その他"]
+
     return render_template(
         "record.html",
         record=record,
         date=record_date,
         weekday=weekday,
-        edit=edit
+        edit=edit,
+        weather_options=weather_options
     )
 
 @app.route("/history")
@@ -171,10 +151,7 @@ def history():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM records WHERE user_id=%s ORDER BY date DESC",
-        (session["user_id"],)
-    )
+    cur.execute("SELECT * FROM records WHERE user_id=%s ORDER BY date DESC", (session["user_id"],))
     records = cur.fetchall()
     cur.close()
     conn.close()
@@ -188,41 +165,29 @@ def calendar_view():
     today = date.today()
     year = today.year
     month = today.month
+
     cal = calendar.Calendar(firstweekday=6)
     month_days = list(cal.itermonthdates(year, month))
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT date, score FROM records WHERE user_id=%s",
-        (session["user_id"],)
-    )
+    cur.execute("SELECT date, score FROM records WHERE user_id=%s", (session["user_id"],))
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
-    # 日付文字列をキーに変換
-    score_map = {}
-    for r in rows:
-        key = r["date"].strftime("%Y-%m-%d")
-        score_map[key] = 1 if r["score"] is not None and r["score"] >= 5 else 0
+    score_map = {r["date"]: 1 if r["score"] is not None and r["score"] >= 5 else 0 for r in rows}
 
     days = []
     for d in month_days:
-        day_str = d.strftime("%Y-%m-%d")
         days.append({
             "day": d.day,
             "in_month": d.month == month,
-            "date_str": day_str,
-            "score": score_map.get(day_str)
+            "score": score_map.get(d),
+            "date_str": d.strftime("%Y-%m-%d")  # カレンダーリンク用
         })
 
-    return render_template(
-        "calendar.html",
-        year=year,
-        month=month,
-        days=days
-    )
+    return render_template("calendar.html", year=year, month=month, days=days)
 
 @app.route("/logout")
 def logout():
