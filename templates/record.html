@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{{ edit and record.date.strftime("%Y-%m-%d") or date }} </h2>
+<!-- <h2>{{ edit and record.date.strftime("%Y-%m-%d") or date }} </h2> -->
 
 <form method="POST">
   <div class="record-card">
     <div class="form-group">
-      <label for="record_date">日付変更＞</label>
+      <label for="record_date"></label>
       <input type="date" id="record_date" name="record_date"
        value="{{ date }}"
        onchange="location.href='?date=' + this.value">
@@ -45,12 +45,6 @@
     <button type="submit" class="button">{{ edit and "更新" or "保存" }}</button>
   </div>
 </form>
-
-<p>
-  <a href="/history">記録を見る</a> |
-  <a href="/calendar">カレンダー</a> |
-  <a href="/logout">ログアウト</a>
-</p>
 
 <script>
   const slider = document.getElementById("score");
