@@ -16,28 +16,20 @@ def get_db_connection():
     if not database_url:
         raise RuntimeError("DATABASE_URL is not set")
 
-    # Renderかどうかで分岐
-    if "render.com" in database_url or "sslmode" in database_url:
-        return psycopg2.connect(
-            database_url,
-            cursor_factory=RealDictCursor,
-            sslmode="require",
-            connect_timeout=5
-        )
-    else:
-        return psycopg2.connect(
-            database_url,
-            cursor_factory=RealDictCursor,
-            connect_timeout=5
-        )
-
+    return psycopg2.connect(
+        database_url,
+        cursor_factory=RealDictCursor,
+        sslmode="require",
+        connect_timeout=5
+    )
 
 # --------------------
-# 初期テーブル作成（手動実行推奨）
+# 初期テーブル作成
 # --------------------
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
@@ -45,6 +37,7 @@ def init_db():
             password TEXT NOT NULL
         );
     """)
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS records (
             id SERIAL PRIMARY KEY,
@@ -56,15 +49,17 @@ def init_db():
             good1 TEXT,
             good2 TEXT,
             good3 TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE (user_id, date)
         );
     """)
+
     conn.commit()
     cur.close()
     conn.close()
 
-with app.app_context():
-    init_db()
+# ★ Render / gunicorn でも必ず実行される
+init_db()
 
 # --------------------
 # ルーティング
@@ -81,19 +76,20 @@ def login():
 
         conn = get_db_connection()
         cur = conn.cursor()
+
         cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
         user = cur.fetchone()
 
         if not user:
             cur.execute(
-                "INSERT INTO users (nickname, password) VALUES (%s, %s)",
+                "INSERT INTO users (nickname, password) VALUES (%s,%s) RETURNING *",
                 (nickname, password)
             )
-            conn.commit()
-            cur.execute("SELECT * FROM users WHERE nickname=%s", (nickname,))
             user = cur.fetchone()
+            conn.commit()
 
         session["user_id"] = user["id"]
+
         cur.close()
         conn.close()
         return redirect("/record")
@@ -111,12 +107,9 @@ def record():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # --------------------
-    # POST（保存・更新）
-    # --------------------
+    # ---------- 保存 ----------
     if request.method == "POST":
         record_date = request.form.get("record_date")
-
         if not record_date:
             cur.close()
             conn.close()
@@ -124,7 +117,6 @@ def record():
 
         weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%a")
 
-        # 既存レコード確認
         cur.execute(
             "SELECT id FROM records WHERE user_id=%s AND date=%s",
             (session["user_id"], record_date)
@@ -132,55 +124,46 @@ def record():
         exists = cur.fetchone()
 
         if exists:
-            cur.execute(
-                """
+            cur.execute("""
                 UPDATE records
                 SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
                 WHERE user_id=%s AND date=%s
-                """,
-                (
-                    request.form.get("weather"),
-                    request.form.get("score"),
-                    request.form.get("good1"),
-                    request.form.get("good2"),
-                    request.form.get("good3"),
-                    session["user_id"],
-                    record_date
-                )
-            )
+            """, (
+                request.form.get("weather"),
+                request.form.get("score"),
+                request.form.get("good1"),
+                request.form.get("good2"),
+                request.form.get("good3"),
+                session["user_id"],
+                record_date
+            ))
         else:
-            cur.execute(
-                """
+            cur.execute("""
                 INSERT INTO records
                 (user_id, date, weekday, weather, score, good1, good2, good3)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-                """,
-                (
-                    session["user_id"],
-                    record_date,
-                    weekday,
-                    request.form.get("weather"),
-                    request.form.get("score"),
-                    request.form.get("good1"),
-                    request.form.get("good2"),
-                    request.form.get("good3")
-                )
-            )
+            """, (
+                session["user_id"],
+                record_date,
+                weekday,
+                request.form.get("weather"),
+                request.form.get("score"),
+                request.form.get("good1"),
+                request.form.get("good2"),
+                request.form.get("good3")
+            ))
 
         conn.commit()
         cur.close()
         conn.close()
         return redirect(f"/record?date={record_date}")
 
-    # --------------------
-    # GET（表示）
-    # --------------------
+    # ---------- 表示 ----------
     date_str = request.args.get("date")
-    if date_str:
-        target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    else:
-        target_date = date.today()
-
+    target_date = (
+        datetime.strptime(date_str, "%Y-%m-%d").date()
+        if date_str else date.today()
+    )
     weekday = target_date.strftime("%a")
 
     cur.execute(
@@ -189,26 +172,21 @@ def record():
     )
     record = cur.fetchone()
 
-    # なければ自動作成
     if not record:
-        cur.execute(
-            """
+        cur.execute("""
             INSERT INTO records (user_id, date, weekday)
             VALUES (%s,%s,%s)
             RETURNING *
-            """,
-            (session["user_id"], target_date, weekday)
-        )
+        """, (session["user_id"], target_date, weekday))
         record = cur.fetchone()
         conn.commit()
 
     cur.close()
     conn.close()
-
     return render_template("record.html", record=record, edit=True)
 
 # --------------------
-# 編集画面（historyカードから）
+# 編集
 # --------------------
 @app.route("/edit/<int:record_id>", methods=["GET", "POST"])
 def edit(record_id):
@@ -217,7 +195,11 @@ def edit(record_id):
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM records WHERE id=%s AND user_id=%s", (record_id, session["user_id"]))
+
+    cur.execute(
+        "SELECT * FROM records WHERE id=%s AND user_id=%s",
+        (record_id, session["user_id"])
+    )
     record = cur.fetchone()
 
     if not record:
@@ -226,19 +208,18 @@ def edit(record_id):
         return "Not Found", 404
 
     if request.method == "POST":
-        record_date = request.form.get("record_date")
         cur.execute("""
             UPDATE records
             SET weather=%s, score=%s, good1=%s, good2=%s, good3=%s
-            WHERE user_id=%s AND date=%s
+            WHERE id=%s AND user_id=%s
         """, (
             request.form.get("weather"),
             request.form.get("score"),
             request.form.get("good1"),
             request.form.get("good2"),
             request.form.get("good3"),
-            session["user_id"],
-            record_date
+            record_id,
+            session["user_id"]
         ))
         conn.commit()
         cur.close()
@@ -247,7 +228,7 @@ def edit(record_id):
 
     cur.close()
     conn.close()
-    return render_template("record.html", edit=True, record=record)
+    return render_template("record.html", record=record, edit=True)
 
 # --------------------
 # 履歴
@@ -259,7 +240,10 @@ def history():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM records WHERE user_id=%s ORDER BY date DESC", (session["user_id"],))
+    cur.execute(
+        "SELECT * FROM records WHERE user_id=%s ORDER BY date DESC",
+        (session["user_id"],)
+    )
     records = cur.fetchall()
     cur.close()
     conn.close()
@@ -288,16 +272,17 @@ def calendar_view():
     cur.close()
     conn.close()
 
-    score_map = {r["date"]: 1 if r["score"] and r["score"] >= 5 else 0 for r in rows}
+    score_map = {
+        r["date"]: 1 if r["score"] is not None and r["score"] >= 5 else 0
+        for r in rows
+    }
 
-    days = []
-    for d in month_days:
-        days.append({
-            "day": d.day,
-            "date":d.strftime("%Y-%m-%d"),
-            "in_month": d.month == month,
-            "score": score_map.get(d)
-        })
+    days = [{
+        "day": d.day,
+        "date": d.strftime("%Y-%m-%d"),
+        "in_month": d.month == month,
+        "score": score_map.get(d)
+    } for d in month_days]
 
     prev_month = month - 1 or 12
     prev_year = year if month > 1 else year - 1
@@ -324,5 +309,4 @@ def logout():
     return redirect("/login")
 
 if __name__ == "__main__":
-    # デバッグ起動用のみ
     app.run(debug=True)
