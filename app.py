@@ -101,19 +101,27 @@ def record():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # POST時は更新
+    # --------------------
+    # POST（保存・更新）
+    # --------------------
     if request.method == "POST":
         record_date = request.form.get("record_date")
+
+        if not record_date:
+            cur.close()
+            conn.close()
+            return redirect("/record")
+
         weekday = datetime.strptime(record_date, "%Y-%m-%d").strftime("%a")
 
         # 既存レコード確認
         cur.execute(
-            "SELECT * FROM records WHERE user_id=%s AND date=%s",
+            "SELECT id FROM records WHERE user_id=%s AND date=%s",
             (session["user_id"], record_date)
         )
-        record = cur.fetchone()
+        exists = cur.fetchone()
 
-        if record:
+        if exists:
             cur.execute(
                 """
                 UPDATE records
@@ -154,7 +162,9 @@ def record():
         conn.close()
         return redirect(f"/record?date={record_date}")
 
-    # GET時
+    # --------------------
+    # GET（表示）
+    # --------------------
     date_str = request.args.get("date")
     if date_str:
         target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -163,31 +173,29 @@ def record():
 
     weekday = target_date.strftime("%a")
 
-    # 日付でレコード取得
     cur.execute(
         "SELECT * FROM records WHERE user_id=%s AND date=%s",
         (session["user_id"], target_date)
     )
     record = cur.fetchone()
 
-    # なければ作成して再取得
+    # なければ自動作成
     if not record:
         cur.execute(
-            "INSERT INTO records (user_id, date, weekday) VALUES (%s,%s,%s)",
+            """
+            INSERT INTO records (user_id, date, weekday)
+            VALUES (%s,%s,%s)
+            RETURNING *
+            """,
             (session["user_id"], target_date, weekday)
         )
-        conn.commit()
-        cur.execute(
-            "SELECT * FROM records WHERE user_id=%s AND date=%s",
-            (session["user_id"], target_date)
-        )
         record = cur.fetchone()
+        conn.commit()
 
     cur.close()
     conn.close()
 
     return render_template("record.html", record=record, edit=True)
-
 
 # --------------------
 # 編集画面（historyカードから）
