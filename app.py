@@ -58,8 +58,10 @@ def init_db():
     cur.close()
     conn.close()
 
-# ★ Render / gunicorn でも必ず実行される
-init_db()
+# DB 初期化（DATABASE_URL がある環境のみ）
+if os.environ.get("DATABASE_URL"):
+    init_db()
+
 
 # --------------------
 # ルーティング
