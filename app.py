@@ -107,7 +107,9 @@ def record():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # ---------- 保存 ----------
+    # --------------------
+    # POST（保存）
+    # --------------------
     if request.method == "POST":
         record_date = request.form.get("record_date")
         if not record_date:
@@ -158,13 +160,14 @@ def record():
         conn.close()
         return redirect(f"/record?date={record_date}")
 
-    # ---------- 表示 ----------
+    # --------------------
+    # GET（表示のみ）
+    # --------------------
     date_str = request.args.get("date")
     target_date = (
         datetime.strptime(date_str, "%Y-%m-%d").date()
         if date_str else date.today()
     )
-    weekday = target_date.strftime("%a")
 
     cur.execute(
         "SELECT * FROM records WHERE user_id=%s AND date=%s",
@@ -172,18 +175,21 @@ def record():
     )
     record = cur.fetchone()
 
-    if not record:
-        cur.execute("""
-            INSERT INTO records (user_id, date, weekday)
-            VALUES (%s,%s,%s)
-            RETURNING *
-        """, (session["user_id"], target_date, weekday))
-        record = cur.fetchone()
-        conn.commit()
-
     cur.close()
     conn.close()
-    return render_template("record.html", record=record, edit=True)
+
+    # レコードが無い場合は「空の辞書」を渡す
+    if not record:
+        record = {
+            "date": target_date,
+            "weather": None,
+            "score": None,
+            "good1": "",
+            "good2": "",
+            "good3": ""
+        }
+
+    return render_template("record.html", record=record)
 
 # --------------------
 # 編集
