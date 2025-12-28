@@ -8,9 +8,6 @@ from psycopg2.extras import RealDictCursor
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
-with app.app_context():
-    init_db()
-
 # --------------------
 # DB接続
 # --------------------
@@ -55,6 +52,9 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
+
+with app.app_context():
+    init_db()
 
 # --------------------
 # ルーティング
