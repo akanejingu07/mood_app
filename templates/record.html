@@ -5,9 +5,12 @@
   <!-- 日付 -->
   <div class="form-group">
     <label for="record_date">日付</label>
-    <input type="date" id="record_date" name="record_date"
-       value="{{ record.date.strftime('%Y-%m-%d') }}"
-       onchange="location.href='/record?date=' + this.value">
+    <input type="date"
+    id="record_date"
+    name="record_date"
+    value="{{ record.date.strftime('%Y-%m-%d') }}"
+    onchange="location.href='/record?date=' + this.value">
+
   </div>
 
   <!-- 気分スコア -->
